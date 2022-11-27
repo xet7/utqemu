@@ -86,13 +86,36 @@ function setup {
 function start_qemu {
     exec $F_QEMU \
         -enable-kvm \
-        -m 2G \
-        -device virtio-vga,virgl=on \
+        -m 4G \
+        -smp 4 \
+        -device qemu-xhci \
+        -device usb-tablet \
+        -device virtio-vga-gl \
         -display sdl,gl=on \
         -netdev user,id=ethernet.0,hostfwd=tcp::10022-:22 \
         -device rtl8139,netdev=ethernet.0 \
         ${IMG_FILE}
 }
+
+# Original:
+#        -m 2G \
+#        -device virtio-vga,virgl=on \
+
+# Changed:
+#   Mouse like USB tablet:
+#        -device qemu-xhci \
+#        -device usb-tablet \
+#   RAM 4G:
+#        -m 4G \
+#   nproc 4:
+#        -smp 4 \
+#   https://github.com/ubports/utqemu/issues/7#issuecomment-978871528
+#        -device virtio-vga-gl \
+#        -display sdl,gl=on \
+
+# Not changed:
+#        -display gtk,gl=on \
+
 
 function start {
     setup
@@ -127,11 +150,11 @@ function ssh {
 
 function usage {
     echo "Ubuntu touch qemu - usage"
-    echo "  utq start    - Stats qemu"
-    echo "  utq create   - Creates ubuntu touch qemu"
-    echo "  utq recreate - reCreates ubuntu touch qemu"
-    echo "  utq delete   - Deletes ubuntu touch qemu"
-    echo "  utq ssh      - ssh into running ubuntu touch qemu"
+    echo "  utqemu start    - Stats qemu"
+    echo "  utqemu create   - Creates ubuntu touch qemu"
+    echo "  utqemu recreate - reCreates ubuntu touch qemu"
+    echo "  utqemu delete   - Deletes ubuntu touch qemu"
+    echo "  utqemu ssh      - ssh into running ubuntu touch qemu"
     echo "  Default user:password is phablet:phablet"
 }
 
